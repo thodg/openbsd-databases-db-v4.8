@@ -1,28 +1,27 @@
-$OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
---- dist/Makefile.in.orig	Thu Jul  5 20:35:02 2007
-+++ dist/Makefile.in	Thu Oct 28 12:27:31 2010
-@@ -11,7 +11,8 @@ exec_prefix=@exec_prefix@
+--- dist/Makefile.in.orig	Mon Apr 12 22:25:22 2010
++++ dist/Makefile.in	Fri Aug 10 20:55:42 2012
+@@ -11,7 +11,8 @@
  bindir=	@bindir@
  includedir=@includedir@
  libdir=	@libdir@
 -docdir=	$(prefix)/docs
-+libsdir=	$(prefix)/lib
-+docdir=	$(prefix)/share/doc/db4
++libsdir=$(prefix)/lib
++docdir=	$(prefix)/share/doc/db4.8
  
  dmode=	755
  emode=	555
-@@ -41,7 +42,9 @@ INSTALLER=	@INSTALLER@
+@@ -42,7 +43,9 @@
  LIBTOOL=	@LIBTOOL@
  
  POSTLINK=	@POSTLINK@
--SOLINK=		@MAKEFILE_SOLINK@
-+dbLINK=		@MAKEFILE_dbLINK@
-+dbtclLINK=	@MAKEFILE_dbtclLINK@
-+dbjavaLINK=	@MAKEFILE_dbjavaLINK@
+-SOLINK=		@MAKEFILE_SOLINK@ @CFLAGS@
++dbLINK=		@MAKEFILE_dbLINK@ @CFLAGS@
++dbtclLINK=	@MAKEFILE_dbtclLINK@ @CFLAGS@
++dbjavaLINK=	@MAKEFILE_dbjavaLINK@ @CFLAGS@
  SOFLAGS=	@SOFLAGS@
  LIBMAJOR=	@DB_VERSION_MAJOR@
  LIBVERSION=	@DB_VERSION_MAJOR@.@DB_VERSION_MINOR@
-@@ -62,11 +65,11 @@ LIBCSO_LIBS=	@LIBCSO_LIBS@ @LIBSO_LIBS@
+@@ -63,11 +66,11 @@
  
  libdb_base=	libdb
  libdb=		$(libdb_base).a
@@ -38,7 +37,7 @@ $OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
  
  ##################################################
  # C++ API.
-@@ -81,11 +84,11 @@ LIBXSO_LIBS=	@LIBXSO_LIBS@ @LIBSO_LIBS@
+@@ -82,11 +85,11 @@
  
  libcxx_base=	libdb_cxx
  libcxx=		$(libcxx_base).a
@@ -53,8 +52,24 @@ $OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
 +libxso_major=	$(libcxx_base)@SOSUFFIX@.$(LIBMAJOR)
  
  ##################################################
+ # STL API.
+@@ -98,11 +101,11 @@
+ 
+ libstl_base=	libdb_stl
+ libstl=		$(libstl_base).a
+-libstl_version=	$(libstl_base)-$(LIBVERSION).a
+-libstlso=	$(libstl_base)-$(LIBVERSION)@SOSUFFIX@
+-libstlso_target=$(libstl_base)-$(LIBVERSION).la
++libstl_version=	$(libstl_base).a
++libstlso=	$(libstl_base)@SOSUFFIX@.$(DBSTLVERSION)
++libstlso_target=$(libstl_base).la
+ libstlso_default=$(libstl_base)@SOSUFFIX@
+-libstlso_major=	$(libstl_base)-$(LIBMAJOR)@SOSUFFIX@
++libstlso_major=	$(libstl_base)@SOSUFFIX@.$(LIBMAJOR)
+ 
+ ##################################################
  # Java API.
-@@ -108,12 +111,12 @@ JAVA_SLEEPYCAT=	$(srcdir)/java/src/com/sleepycat
+@@ -127,12 +130,12 @@
  libj_jarfile=	db.jar
  libj_exjarfile=	dbexamples.jar
  libjso_base=	libdb_java
@@ -72,64 +87,80 @@ $OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
  
  ##################################################
  # TCL API.
-@@ -123,11 +126,11 @@ libjso_g=	$(libjso_base)-$(LIBVERSION)_g@JMODSUFFIX@
+@@ -142,11 +145,11 @@
  TCL_INCLUDE_SPEC=	@TCL_INCLUDE_SPEC@
  LIBTSO_LIBS=	@LIBTSO_LIBS@ @LIBSO_LIBS@
  libtso_base=	libdb_tcl
--libtso=		$(libtso_base)-$(LIBVERSION)@MODSUFFIX@
+-libtso=		$(libtso_base)-$(LIBVERSION)@LIBTSO_MODSUFFIX@
 -libtso_static=	$(libtso_base)-$(LIBVERSION).a
 -libtso_target=	$(libtso_base)-$(LIBVERSION).la
-+libtso=		$(libtso_base)@MODSUFFIX@.$(DBTCLVERSION)
++libtso=		$(libtso_base)@LIBTSO_MODSUFFIX@.$(LIBTCLVERSION)
 +libtso_static=	$(libtso_base).a
 +libtso_target=	$(libtso_base).la
- libtso_default=	$(libtso_base)@MODSUFFIX@
--libtso_major=	$(libtso_base)-$(LIBMAJOR)@MODSUFFIX@
-+libtso_major=	$(libtso_base)@MODSUFFIX@.$(LIBMAJOR)
+ libtso_default=	$(libtso_base)@LIBTSO_MODSUFFIX@
+-libtso_major=	$(libtso_base)-$(LIBMAJOR)@LIBTSO_MODSUFFIX@
++libtso_major=	$(libtso_base)@LIBTSO_MODSUFFIX@.$(LIBMAJOR)
  
  ##################################################
  # db_dump185 UTILITY
-@@ -531,9 +534,9 @@ RPC_CXXSRV_OBJS=\
+@@ -704,9 +707,9 @@
  
  UTIL_PROGS=\
  	@ADDITIONAL_PROGS@ \
--	db_archive db_checkpoint db_codegen db_deadlock db_dump \
--	db_hotbackup db_load db_printlog db_recover db_stat db_upgrade \
+-	db_archive db_checkpoint db_deadlock db_dump \
+-	db_hotbackup db_load db_printlog db_recover db_sql db_stat db_upgrade \
 -	db_verify
-+	db4_archive db4_checkpoint db4_codegen db4_deadlock db4_dump \
-+	db4_hotbackup db4_load db4_printlog db4_recover db4_stat db4_upgrade \
-+	db4_verify
++	db4.8_archive db4.8_checkpoint db4.8_deadlock db4.8_dump \
++	db4.8_hotbackup db4.8_load db4.8_printlog db4.8_recover db4.8_sql db4.8_stat db4.8_upgrade \
++	db4.8_verify
  
  ##################################################
  # List of files installed into the library directory.
-@@ -584,14 +587,10 @@ $(libdb): $(DEF_LIB)
+@@ -763,14 +766,10 @@
  $(libdb_version): $(C_OBJS)
  	$(AR) cr $@ $(C_OBJS)
  	$(RANLIB) $@
--	$(RM) -f $(libdb)
+-	$(RM) $(libdb)
 -	$(LN) -s $(libdb_version) $(libdb)
  
  # Shared C library.
  $(libso_target): $(C_OBJS)
 -	$(SOLINK) $(SOFLAGS) $(LDFLAGS) -o $@ $(C_OBJS) $(LIBCSO_LIBS)
--	$(RM) -f $(libdb)
+-	$(RM) $(libdb)
 -	$(LN) -s .libs/$(libdb_version) $(libdb)
 +	$(dbLINK) $(SOFLAGS) $(LDFLAGS) -o $@ $(C_OBJS) $(LIBCSO_LIBS)
  
  # Static C++ library named libdb_cxx.a.
  $(libcxx): $(DEF_LIB_CXX)
-@@ -600,24 +599,20 @@ $(libcxx): $(DEF_LIB_CXX)
+@@ -779,15 +778,11 @@
  $(libcxx_version): $(CXX_OBJS) $(C_OBJS)
  	$(AR) cr $@ $(CXX_OBJS) $(C_OBJS)
  	$(RANLIB) $@
--	$(RM) -f $(libcxx)
+-	$(RM) $(libcxx)
 -	$(LN) -s $(libcxx_version) $(libcxx)
  
  # Shared C++ library.
  $(libxso_target): $(CXX_OBJS) $(C_OBJS)
  	$(XSOLINK) $(SOFLAGS) $(LDFLAGS) \
  	    -o $@ $(CXX_OBJS) $(C_OBJS) $(LIBXSO_LIBS)
--	$(RM) -f $(libcxx)
+-	$(RM) $(libcxx)
 -	$(LN) -s .libs/$(libcxx_version) $(libcxx)
+ 
+ # Static STL library named libdb_stl.a.
+ $(libstl): $(DEF_LIB_STL)
+@@ -796,24 +791,20 @@
+ $(libstl_version): $(STL_OBJS) $(CXX_OBJS) $(C_OBJS)
+ 	$(AR) cr $@ $(STL_OBJS) $(CXX_OBJS) $(C_OBJS)
+ 	$(RANLIB) $@
+-	$(RM) $(libstl)
+-	$(LN) -s $(libstl_version) $(libstl)
+ 
+ # Shared STL library.
+ $(libstlso_target): $(STL_OBJS) $(CXX_OBJS) $(C_OBJS)
+ 	$(XSOLINK) $(SOFLAGS) $(LDFLAGS) -o $@ \
+ 	    $(STL_OBJS) $(LIBSTLSO_LIBS) $(CXX_OBJS) $(C_OBJS) $(LIBXSO_LIBS)
+-	$(RM) $(libstl)
+-	$(LN) -s .libs/$(libstl_version) $(libstl)
  
  # Shared Java library.
  $(libjso_target): $(JAVA_OBJS) $(C_OBJS)
@@ -144,143 +175,120 @@ $OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
  	    -o $@ $(TCL_OBJS) $(C_OBJS) $(LIBTSO_LIBS)
  
  ##################################################
-@@ -654,66 +649,66 @@ berkeley_db_cxxsvc: $(RPC_CXXSRV_OBJS) util_log@o@ $(D
+@@ -853,46 +844,46 @@
  	    $(RPC_CXXSRV_OBJS) util_log@o@ $(DEF_LIB_CXX) $(LIBS)
  	$(POSTLINK) $@
  
 -db_archive: db_archive@o@ util_sig@o@ $(DEF_LIB)
-+db4_archive: db_archive@o@ util_sig@o@ $(DEF_LIB)
++db4.8_archive: db_archive@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_archive@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_checkpoint: db_checkpoint@o@ util_log@o@ util_sig@o@ $(DEF_LIB)
-+db4_checkpoint: db_checkpoint@o@ util_log@o@ util_sig@o@ $(DEF_LIB)
++db4.8_checkpoint: db_checkpoint@o@ util_log@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_checkpoint@o@ util_log@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
--db_codegen: db_codegen@o@ code_capi@o@ code_parse@o@ $(DEF_LIB)
-+db4_codegen: db_codegen@o@ code_capi@o@ code_parse@o@ $(DEF_LIB)
- 	$(CCLINK) -o $@ $(LDFLAGS) \
- 	    db_codegen@o@ code_capi@o@ code_parse@o@ $(DEF_LIB) $(LIBS)
- 	$(POSTLINK) $@
- 
 -db_deadlock: db_deadlock@o@ util_log@o@ util_sig@o@ $(DEF_LIB)
-+db4_deadlock: db_deadlock@o@ util_log@o@ util_sig@o@ $(DEF_LIB)
++db4.8_deadlock: db_deadlock@o@ util_log@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_deadlock@o@ util_log@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_dump: db_dump@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
-+db4_dump: db_dump@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
++db4.8_dump: db_dump@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_dump@o@ util_cache@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_dump185: db_dump185@o@ @REPLACEMENT_OBJS@
-+db4_dump185: db_dump185@o@ @REPLACEMENT_OBJS@
++db4.8_dump185: db_dump185@o@ @REPLACEMENT_OBJS@
  	$(CCLINK) -o $@ $(LDFLAGS) db_dump185@o@ @REPLACEMENT_OBJS@ $(DB185LIB)
  	$(POSTLINK) $@
  
 -db_hotbackup: db_hotbackup@o@ util_sig@o@ $(DEF_LIB)
-+db4_hotbackup: db_hotbackup@o@ util_sig@o@ $(DEF_LIB)
++db4.8_hotbackup: db_hotbackup@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_hotbackup@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_load: db_load@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
-+db4_load: db_load@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
++db4.8_load: db_load@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_load@o@ util_cache@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_printlog: db_printlog@o@ $(PRINT_OBJS) util_sig@o@ $(DEF_LIB)
-+db4_printlog: db_printlog@o@ $(PRINT_OBJS) util_sig@o@ $(DEF_LIB)
++db4.8_printlog: db_printlog@o@ $(PRINT_OBJS) util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_printlog@o@ $(PRINT_OBJS) util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_recover: db_recover@o@ util_sig@o@ $(DEF_LIB)
-+db4_recover: db_recover@o@ util_sig@o@ $(DEF_LIB)
++db4.8_recover: db_recover@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_recover@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
+@@ -901,22 +892,22 @@
+           db_sql@o@ parse@o@ preparser@o@ parsefuncs@o@ tokenize@o@ \
+           sqlprintf@o@ buildpt@o@ utils@o@ generate@o@ generate_test@o@ \
+           generation_utils@o@ generate_verification@o@ hint_comment@o@
+-db_sql: $(DBSQL_OBJS) $(DEF_LIB)
++db4.8_sql: $(DBSQL_OBJS) $(DEF_LIB)
+ 	$(CCLINK) -o $@ $(LDFLAGS) $(DBSQL_OBJS) \
+             $(DEF_LIB) $(LIBS)
+ 	$(POSTLINK) $@
  
 -db_stat: db_stat@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
-+db4_stat: db_stat@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
++db4.8_stat: db_stat@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_stat@o@ util_cache@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_upgrade: db_upgrade@o@ util_sig@o@ $(DEF_LIB)
-+db4_upgrade: db_upgrade@o@ util_sig@o@ $(DEF_LIB)
++db4.8_upgrade: db_upgrade@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_upgrade@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
  
 -db_verify: db_verify@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
-+db4_verify: db_verify@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
++db4.8_verify: db_verify@o@ util_cache@o@ util_sig@o@ $(DEF_LIB)
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_verify@o@ util_cache@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
-@@ -727,41 +722,36 @@ library_install: install_include install_lib install_u
- uninstall: uninstall_include uninstall_lib uninstall_utilities uninstall_docs
- 
- install_setup:
--	@test -d $(DESTDIR)$(prefix) || \
-+	test -d $(DESTDIR)$(prefix) || \
- 	    ($(MKDIR) -p $(DESTDIR)$(prefix) && \
- 	    $(CHMOD) $(dmode) $(DESTDIR)$(prefix))
- 
- INCDOT=	db.h db_cxx.h @ADDITIONAL_INCS@
- install_include:
- 	@echo "Installing DB include files: $(DESTDIR)$(includedir) ..."
--	@test -d $(DESTDIR)$(includedir) || \
-+	test -d $(DESTDIR)$(includedir) || \
- 	    ($(MKDIR) -p $(DESTDIR)$(includedir) && \
- 	    $(CHMOD) $(dmode) $(DESTDIR)$(includedir))
--	@cd $(DESTDIR)$(includedir) && $(RM) -f $(INCDOT)
--	@$(CP) -p $(INCDOT) $(DESTDIR)$(includedir)
--	@cd $(DESTDIR)$(includedir) && $(CHMOD) $(fmode) $(INCDOT)
-+	cd $(DESTDIR)$(includedir) && $(RM) -f $(INCDOT)
-+	${BSD_INSTALL_DATA} -p $(INCDOT) $(DESTDIR)$(includedir)
-+	cd $(DESTDIR)$(includedir) && $(CHMOD) $(fmode) $(INCDOT)
- 
- uninstall_include:
- 	@cd $(DESTDIR)$(includedir) && $(RM) -f $(INCDOT)
+@@ -954,36 +945,20 @@
  
  install_lib:
  	@echo "Installing DB library: $(DESTDIR)$(libdir) ..."
 -	@test -d $(DESTDIR)$(libdir) || \
-+	test -d $(DESTDIR)$(libdir) || \
- 	    ($(MKDIR) -p $(DESTDIR)$(libdir) && \
- 	    $(CHMOD) $(dmode) $(DESTDIR)$(libdir))
--	@cd $(DESTDIR)$(libdir) && $(RM) -f $(LIB_INSTALL_FILE_LIST)
+-	    ($(MKDIR) -p $(DESTDIR)$(libdir) && \
+-	    $(CHMOD) $(dmode) $(DESTDIR)$(libdir))
+-	@cd $(DESTDIR)$(libdir) && $(RM) $(LIB_INSTALL_FILE_LIST)
 -	@$(INSTALLER) @INSTALL_LIBS@ $(DESTDIR)$(libdir)
 -	@(cd $(DESTDIR)$(libdir) && \
 -	    test -f $(libso) && $(LN) -s $(libso) $(libso_default); \
 -	    test -f $(libso) && $(LN) -s $(libso) $(libso_major); \
 -	    test -f $(libxso) && $(LN) -s $(libxso) $(libxso_default); \
 -	    test -f $(libxso) && $(LN) -s $(libxso) $(libxso_major); \
+-	    test -f $(libstlso) && $(LN) -s $(libstlso) $(libstlso_default); \
+-	    test -f $(libstlso) && $(LN) -s $(libstlso) $(libstlso_major); \
 -	    test -f $(libtso) && $(LN) -s $(libtso) $(libtso_default); \
 -	    test -f $(libtso) && $(LN) -s $(libtso) $(libtso_major); \
 -	    test -f $(libjso) && $(LN) -s $(libjso) $(libjso_default); \
 -	    test -f $(libjso) && $(LN) -s $(libjso) $(libjso_major); \
 -	    test -f $(libjso) && $(LN) -s $(libjso) $(libjso_g)) || exit 0
 -	@(test -f $(libj_jarfile) && \
-+	cd $(DESTDIR)$(libdir) && $(RM) -f $(LIB_INSTALL_FILE_LIST)
-+	$(INSTALLER) @INSTALL_LIBS@ $(DESTDIR)$(libdir)
-+	(cd $(DESTDIR)$(libdir) && \
-+	    test -f $(libso) && $(LN) -s db4/$(libso) ..; \
-+	    test -f $(libxso) && $(LN) -s db4/$(libxso) ..; \
-+	    test -f $(libtso) && $(LN) -s db4/$(libtso) ..; \
-+	    test -f $(libjso) && $(LN) -s db4/$(libjso) ..) || exit 0
-+	(test -f $(libj_jarfile) && \
- 	    $(CP) $(libj_jarfile) $(DESTDIR)$(libdir) && \
- 	    $(CHMOD) $(fmode) $(DESTDIR)$(libdir)/$(libj_jarfile)) || exit 0
+-	    $(CP) $(libj_jarfile) $(DESTDIR)$(libdir) && \
+-	    $(CHMOD) $(fmode) $(DESTDIR)$(libdir)/$(libj_jarfile)) || exit 0
++	test -d $(DESTDIR)$(libdir) || ( \
++	  $(MKDIR) -p $(DESTDIR)$(libdir) && \
++	  $(CHMOD) $(dmode) $(DESTDIR)$(libdir) \
++	 )
  
-@@ -770,10 +760,10 @@ uninstall_lib:
+ uninstall_lib:
+ 	@cd $(DESTDIR)$(libdir) && $(RM) $(LIB_INSTALL_FILE_LIST)
  
  install_utilities:
  	@echo "Installing DB utilities: $(DESTDIR)$(bindir) ..."
@@ -291,9 +299,9 @@ $OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
 -	@for i in $(UTIL_PROGS); do \
 +	for i in $(UTIL_PROGS); do \
  		test -f $$i.exe && i=$$i.exe || i=$$i; \
- 		$(RM) -f $(DESTDIR)$(bindir)/$$i; \
+ 		$(RM) $(DESTDIR)$(bindir)/$$i; \
  		$(INSTALLER) $$i $(DESTDIR)$(bindir)/$$i; \
-@@ -791,11 +781,12 @@ DOCLIST=api_c api_cxx api_tcl articles collections gsg
+@@ -1001,11 +976,11 @@
  
  install_docs:
  	@echo "Installing documentation: $(DESTDIR)$(docdir) ..."
@@ -301,11 +309,10 @@ $OpenBSD: patch-dist_Makefile_in,v 1.10 2010/10/28 10:33:16 steven Exp $
 +	test -d $(DESTDIR)$(docdir) || \
  	    ($(MKDIR) -p $(DESTDIR)$(docdir) && \
  	    $(CHMOD) $(dmode) $(DESTDIR)$(docdir))
--	@cd $(DESTDIR)$(docdir) && $(RM) -rf $(DOCLIST)
+-	@cd $(DESTDIR)$(docdir) && $(RM) -r $(DOCLIST)
 -	@cd $(srcdir)/docs && $(CP) -pr $(DOCLIST) $(DESTDIR)$(docdir)/
-+	cd $(DESTDIR)$(docdir) && $(RM) -rf $(DOCLIST)
++	cd $(DESTDIR)$(docdir) && $(RM) -r $(DOCLIST)
 +	cd $(srcdir)/docs && $(CP) -pr $(DOCLIST) $(DESTDIR)$(docdir)/
-+	chown -R root:wheel $(DESTDIR)$(docdir)/
  
  uninstall_docs:
- 	@cd $(DESTDIR)$(docdir) && $(RM) -rf $(DOCLIST)
+ 	@cd $(DESTDIR)$(docdir) && $(RM) -r $(DOCLIST)

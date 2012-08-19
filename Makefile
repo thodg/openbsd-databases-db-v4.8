@@ -3,7 +3,8 @@
 COMMENT-java=	Java bindings for Berkeley DB, revision ${REV}
 
 REV=		4
-VERSION=	${REV}.6.21
+SUBREV=		8
+VERSION=	${REV}.${SUBREV}.30
 PKGNAME-main=	${DISTNAME}
 PKGSPEC-main =	db->=4,<5|db->=4v0,<5v0
 PKGSPEC-java =  db-java->=4,<5|db-java->=4v0,<5v0
@@ -14,28 +15,28 @@ PKGNAME-tcl=	db-tcl-${VERSION}
 EPOCH-main=	0
 EPOCH-java=	0
 EPOCH-tcl=	0
-REVISION-java =	1
+REVISION-java =	0
 REVISION-tcl =	0
-DBLIBDIR=	lib/db4
+DBLIBDIR=	lib/db${REV}.${SUBREV}
 
 # XXX sync LIBdb_VERSION in x11/gnome/libgda
-SHARED_LIBS +=	db                   5.0      # .0.0
-SHARED_LIBS +=	db_cxx               6.0      # .0.0
-SHARED_LIBS +=	db_java              5.0      # .0.0
-SHARED_LIBS +=	db_tcl               6.0      # .0.0
+SHARED_LIBS +=	db                   6.0      # .0.0
+SHARED_LIBS +=	db_cxx               7.0      # .0.0
+SHARED_LIBS +=	db_java              6.0      # .0.0
+SHARED_LIBS +=	db_tcl               7.0      # .0.0
 
 MASTER_SITES0=	${HOMEPAGE}db/update/${VERSION}/
 # patch 2 has converted DOS line-endings; no other change
 # patches 1,3,4 are just mirrored
-MASTER_SITES2=	http://spacehopper.org/mirrors/
-PATCHFILES=	patch.${VERSION}.1:2 \
-		patch.${VERSION}.2.fixed:2 \
-		patch.${VERSION}.3:2 \
-		patch.${VERSION}.4:2
+#MASTER_SITES2=	http://spacehopper.org/mirrors/
+#PATCHFILES=	patch.${VERSION}.1:2 \
+#		patch.${VERSION}.2.fixed:2 \
+#		patch.${VERSION}.3:2 \
+#		patch.${VERSION}.4:2
 
 CONFIGURE_STYLE=gnu
 
-DEST_SUBDIR=	${REV}
+DEST_SUBDIR=	${REV}.${SUBREV}
 WANTLIB=	c m stdc++
 
 PSEUDO_FLAVORS=	no_java bootstrap
