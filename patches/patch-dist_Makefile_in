@@ -1,5 +1,5 @@
 --- dist/Makefile.in.orig	Mon Apr 12 22:25:22 2010
-+++ dist/Makefile.in	Fri Aug 10 20:55:42 2012
++++ dist/Makefile.in	Fri Aug 31 19:53:21 2012
 @@ -11,7 +11,8 @@
  bindir=	@bindir@
  includedir=@includedir@
@@ -258,13 +258,14 @@
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_verify@o@ util_cache@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
-@@ -954,36 +945,20 @@
+@@ -954,24 +945,18 @@
  
  install_lib:
  	@echo "Installing DB library: $(DESTDIR)$(libdir) ..."
 -	@test -d $(DESTDIR)$(libdir) || \
--	    ($(MKDIR) -p $(DESTDIR)$(libdir) && \
--	    $(CHMOD) $(dmode) $(DESTDIR)$(libdir))
++	test -d $(DESTDIR)$(libdir) || \
+ 	    ($(MKDIR) -p $(DESTDIR)$(libdir) && \
+ 	    $(CHMOD) $(dmode) $(DESTDIR)$(libdir))
 -	@cd $(DESTDIR)$(libdir) && $(RM) $(LIB_INSTALL_FILE_LIST)
 -	@$(INSTALLER) @INSTALL_LIBS@ $(DESTDIR)$(libdir)
 -	@(cd $(DESTDIR)$(libdir) && \
@@ -280,15 +281,19 @@
 -	    test -f $(libjso) && $(LN) -s $(libjso) $(libjso_major); \
 -	    test -f $(libjso) && $(LN) -s $(libjso) $(libjso_g)) || exit 0
 -	@(test -f $(libj_jarfile) && \
--	    $(CP) $(libj_jarfile) $(DESTDIR)$(libdir) && \
--	    $(CHMOD) $(fmode) $(DESTDIR)$(libdir)/$(libj_jarfile)) || exit 0
-+	test -d $(DESTDIR)$(libdir) || ( \
-+	  $(MKDIR) -p $(DESTDIR)$(libdir) && \
-+	  $(CHMOD) $(dmode) $(DESTDIR)$(libdir) \
-+	 )
++	cd $(DESTDIR)$(libdir) && $(RM) $(LIB_INSTALL_FILE_LIST)
++	$(INSTALLER) @INSTALL_LIBS@ $(DESTDIR)$(libdir)
++	(cd $(DESTDIR)$(libdir) && \
++	    test -f $(libso) && $(LN) -s $(libso) ..; \
++	    test -f $(libxso) && $(LN) -s $(libxso) ..; \
++	    test -f $(libstlso) && $(LN) -s $(libstlso) ..; \
++	    test -f $(libtso) && $(LN) -s $(libtso) ..; \
++	    test -f $(libjso) && $(LN) -s $(libjso) ..) || exit 0
++	(test -f $(libj_jarfile) && \
+ 	    $(CP) $(libj_jarfile) $(DESTDIR)$(libdir) && \
+ 	    $(CHMOD) $(fmode) $(DESTDIR)$(libdir)/$(libj_jarfile)) || exit 0
  
- uninstall_lib:
- 	@cd $(DESTDIR)$(libdir) && $(RM) $(LIB_INSTALL_FILE_LIST)
+@@ -980,10 +965,10 @@
  
  install_utilities:
  	@echo "Installing DB utilities: $(DESTDIR)$(bindir) ..."
@@ -301,7 +306,7 @@
  		test -f $$i.exe && i=$$i.exe || i=$$i; \
  		$(RM) $(DESTDIR)$(bindir)/$$i; \
  		$(INSTALLER) $$i $(DESTDIR)$(bindir)/$$i; \
-@@ -1001,11 +976,11 @@
+@@ -1001,11 +986,11 @@
  
  install_docs:
  	@echo "Installing documentation: $(DESTDIR)$(docdir) ..."
