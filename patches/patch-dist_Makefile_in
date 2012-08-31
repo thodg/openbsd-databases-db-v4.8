@@ -284,11 +284,11 @@
 +	cd $(DESTDIR)$(libdir) && $(RM) $(LIB_INSTALL_FILE_LIST)
 +	$(INSTALLER) @INSTALL_LIBS@ $(DESTDIR)$(libdir)
 +	(cd $(DESTDIR)$(libdir) && \
-+	    test -f $(libso) && $(LN) -s $(libso) ..; \
-+	    test -f $(libxso) && $(LN) -s $(libxso) ..; \
-+	    test -f $(libstlso) && $(LN) -s $(libstlso) ..; \
-+	    test -f $(libtso) && $(LN) -s $(libtso) ..; \
-+	    test -f $(libjso) && $(LN) -s $(libjso) ..) || exit 0
++	    test -f $(libso) && $(LN) -s db4.8/$(libso) ..; \
++	    test -f $(libxso) && $(LN) -s db4.8/$(libxso) ..; \
++	    test -f $(libstlso) && $(LN) -s db4.8/$(libstlso) ..; \
++	    test -f $(libtso) && $(LN) -s db4.8/$(libtso) ..; \
++	    test -f $(libjso) && $(LN) -s db4.8/$(libjso) ..) || exit 0
 +	(test -f $(libj_jarfile) && \
  	    $(CP) $(libj_jarfile) $(DESTDIR)$(libdir) && \
  	    $(CHMOD) $(fmode) $(DESTDIR)$(libdir)/$(libj_jarfile)) || exit 0
