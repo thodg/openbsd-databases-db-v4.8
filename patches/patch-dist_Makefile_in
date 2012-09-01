@@ -1,5 +1,5 @@
 --- dist/Makefile.in.orig	Mon Apr 12 22:25:22 2010
-+++ dist/Makefile.in	Sat Sep  1 01:01:54 2012
++++ dist/Makefile.in	Sat Sep  1 03:03:13 2012
 @@ -11,7 +11,8 @@
  bindir=	@bindir@
  includedir=@includedir@
@@ -258,6 +258,25 @@
  	$(CCLINK) -o $@ $(LDFLAGS) \
  	    db_verify@o@ util_cache@o@ util_sig@o@ $(DEF_LIB) $(LIBS)
  	$(POSTLINK) $@
+@@ -937,14 +928,14 @@
+ INCDOT=	db.h db_cxx.h @ADDITIONAL_INCS@
+ install_include:
+ 	@echo "Installing DB include files: $(DESTDIR)$(includedir) ..."
+-	@test -d $(DESTDIR)$(includedir) || \
++	test -d $(DESTDIR)$(includedir) || \
+ 	    ($(MKDIR) -p $(DESTDIR)$(includedir) && \
+ 	    $(CHMOD) $(dmode) $(DESTDIR)$(includedir))
+-	@cd $(DESTDIR)$(includedir) && $(RM) $(INCDOT)
+-	@for f in $(INCDOT); do \
++	cd $(DESTDIR)$(includedir) && $(RM) $(INCDOT)
++	for f in $(INCDOT); do \
+ 	    for d in . $(srcdir)/stl ; do \
+ 	        test -f $$d/$$f && \
+-	            $(CP) -p $$d/$$f $(DESTDIR)$(includedir) ; \
++	            ${BSD_INSTALL_DATA} -p $$d/$$f $(DESTDIR)$(includedir) ; \
+ 	    done ; \
+ 	    $(CHMOD) $(fmode) $(DESTDIR)$(includedir)/$$f ; \
+ 	done
 @@ -954,24 +945,18 @@
  
  install_lib:
