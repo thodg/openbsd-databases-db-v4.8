@@ -1,5 +1,5 @@
 --- dist/Makefile.in.orig	Mon Apr 12 22:25:22 2010
-+++ dist/Makefile.in	Fri Aug 31 19:53:21 2012
++++ dist/Makefile.in	Sat Sep  1 01:01:54 2012
 @@ -11,7 +11,8 @@
  bindir=	@bindir@
  includedir=@includedir@
@@ -306,7 +306,7 @@
  		test -f $$i.exe && i=$$i.exe || i=$$i; \
  		$(RM) $(DESTDIR)$(bindir)/$$i; \
  		$(INSTALLER) $$i $(DESTDIR)$(bindir)/$$i; \
-@@ -1001,11 +986,11 @@
+@@ -1001,11 +986,12 @@
  
  install_docs:
  	@echo "Installing documentation: $(DESTDIR)$(docdir) ..."
@@ -318,6 +318,7 @@
 -	@cd $(srcdir)/docs && $(CP) -pr $(DOCLIST) $(DESTDIR)$(docdir)/
 +	cd $(DESTDIR)$(docdir) && $(RM) -r $(DOCLIST)
 +	cd $(srcdir)/docs && $(CP) -pr $(DOCLIST) $(DESTDIR)$(docdir)/
++	chown -R root:wheel $(DESTDIR)$(docdir)/
  
  uninstall_docs:
  	@cd $(DESTDIR)$(docdir) && $(RM) -r $(DOCLIST)
