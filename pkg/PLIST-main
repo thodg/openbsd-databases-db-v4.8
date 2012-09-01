@@ -33,8 +33,6 @@ lib/db4.8/libdb_cxx.a
 lib/db4.8/libdb_cxx.la
 lib/db4.8/libdb_tcl.a
 lib/db4.8/libdb_tcl.la
-@lib lib/libdb.so.${LIBdb_VERSION}
-@lib lib/libdb_cxx.so.${LIBdb_cxx_VERSION}
 share/doc/db4.8/
 share/doc/db4.8/api_reference/
 share/doc/db4.8/api_reference/C/

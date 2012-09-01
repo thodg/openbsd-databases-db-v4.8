@@ -2,3 +2,5 @@
 @lib lib/db4.8/libdb.so.${LIBdb_VERSION}
 @lib lib/db4.8/libdb_cxx.so.${LIBdb_cxx_VERSION}
 @lib lib/db4.8/libdb_tcl.so.${LIBdb_tcl_VERSION}
+@lib lib/libdb.so.${LIBdb_VERSION}
+@lib lib/libdb_cxx.so.${LIBdb_cxx_VERSION}
