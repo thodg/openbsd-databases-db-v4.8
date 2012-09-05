@@ -6,9 +6,9 @@ REV=		4
 SUBREV=		8
 VERSION=	${REV}.${SUBREV}.30
 PKGNAME-main=	${DISTNAME}
-PKGSPEC-main =	db->=4,<5|db->=4v0,<5v0
-PKGSPEC-java =  db-java->=4,<5|db-java->=4v0,<5v0
-PKGSPEC-tcl =   db-tcl->=4,<5|db-tcl->=4v0,<5v0
+PKGSPEC-main =	db->=4.8,<5|db->=4.8v0,<5v0
+PKGSPEC-java =  db-java->=4.8,<5|db-java->=4.8v0,<5v0
+PKGSPEC-tcl =   db-tcl->=4.8,<5|db-tcl->=4.8v0,<5v0
 
 PKGNAME-java=	db-java-${VERSION}
 PKGNAME-tcl=	db-tcl-${VERSION}
